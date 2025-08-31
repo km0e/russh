@@ -15,16 +15,17 @@ rust-version = "1.85"
 [features]
 default = ["flate2", "aws-lc-rs", "rsa"]
 # Crypto backends: enable at least one of `aws-lc-rs` or `ring`.
-aws-lc-rs = ["dep:aws-lc-rs"] # Default crypto backend.
+aws-lc-rs = ["dep:aws-lc-rs"]           # Default crypto backend.
 async-trait = ["dep:async-trait"]
 legacy-ed25519-pkcs8-parser = ["yasna"]
 # Danger: 3DES cipher is insecure.
 des = ["dep:des"]
 # Danger: DSA algorithm is insecure.
 dsa = ["ssh-key/dsa"]
-ring = ["dep:ring"] # Alternative crypto backend.
+ring = ["dep:ring"]                                               # Alternative crypto backend.
 rsa = ["dep:rsa", "dep:pkcs1", "ssh-key/rsa", "ssh-key/rsa-sha1"]
 serde = ["ssh-key/serde"]
+pty = ["dep:e4pty", "async-trait"]
 _bench = ["dep:criterion"]
 
 [dependencies]
@@ -45,6 +46,7 @@ delegate.workspace = true
 digest.workspace = true
 der = "0.8"
 des = { version = "0.8.1", optional = true }
+e4pty = { version = "0.1", optional = true }
 ecdsa = "0.17.0-rc.16"
 ed25519-dalek = { version = "3.0.0-pre.6", features = ["alloc", "rand_core", "pkcs8"] }
 elliptic-curve = { version = "0.14.0-rc.28", features = ["ecdh"] }

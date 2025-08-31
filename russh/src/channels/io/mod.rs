@@ -6,6 +6,16 @@ pub use rx::ChannelRx;
 mod tx;
 pub use tx::ChannelTx;
 
+#[cfg(feature = "pty")]
+mod pty;
+#[cfg(feature = "pty")]
+pub use pty::PtyCtlImpl;
+
+#[cfg(feature = "pty")]
+mod ptyrx;
+#[cfg(feature = "pty")]
+pub use ptyrx::PtyRx;
+
 use crate::{Channel, ChannelId, ChannelMsg, ChannelReadHalf};
 
 #[derive(Debug)]

@@ -624,4 +624,24 @@ impl<S: From<(ChannelId, ChannelMsg)> + Send + Sync + 'static> Channel<S> {
     pub fn make_writer_ext(&self, ext: Option<u32>) -> impl AsyncWrite + 'static {
         self.write_half.make_writer_ext(ext)
     }
+
+    /// Consume the [`Channel`] to produce pty reader and writer,
+    #[cfg(feature = "pty")]
+    pub fn into_pty(self) -> e4pty::prelude::BoxedPty {
+        let exit_status = Arc::new(std::sync::Mutex::new(None));
+        e4pty::prelude::BoxedPty::new(
+            io::PtyCtlImpl {
+                exit_status: exit_status.clone(),
+            },
+            io::ChannelTx::new(
+                self.write_half.sender.clone(),
+                self.id(),
+                self.write_half.window_size.value.clone(),
+                self.write_half.window_size.subscribe(),
+                self.write_half.max_packet_size,
+                None,
+            ),
+            io::PtyRx::new(io::ChannelCloseOnDrop(self), None, exit_status),
+        )
+    }
 }

@@ -200,3 +200,36 @@ impl<S> Drop for ChannelTx<S> {
         self.notify.notify_one();
     }
 }
+
+#[cfg(feature = "pty")]
+#[async_trait::async_trait]
+impl<S> e4pty::prelude::PtyWriter for ChannelTx<S>
+where
+    S: From<(ChannelId, ChannelMsg)> + 'static + Send,
+{
+    async fn window_change(&self, width: u16, height: u16) -> e4pty::Result<()> {
+        self.sender
+            .send(
+                (
+                    self.id,
+                    ChannelMsg::WindowChange {
+                        col_width: width as u32,
+                        row_height: height as u32,
+                        pix_width: 0,
+                        pix_height: 0,
+                    },
+                )
+                    .into(),
+            )
+            .await
+            .map_err(|e| e4pty::Error::Unknown(e.to_string()))?;
+        Ok(())
+    }
+    async fn eof(&self) -> e4pty::Result<()> {
+        self.sender
+            .send((self.id, ChannelMsg::Eof).into())
+            .await
+            .map_err(|e| e4pty::Error::Unknown(e.to_string()))?;
+        Ok(())
+    }
+}
