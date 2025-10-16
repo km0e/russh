@@ -168,6 +168,14 @@ impl Config {
             .unwrap_or(&self.host_name)
     }
 
+    pub fn identity_files(&self) -> Option<&[PathBuf]> {
+        self.host_config.identity_file.as_deref()
+    }
+
+    pub fn proxy_jump(&self) -> Option<&str> {
+        self.host_config.proxy_jump.as_deref()
+    }
+
     // Look for any of the ssh_config(5) percent-style tokens and expand them
     // based on current data in the struct, returning a new String. This function
     // can be employed late/lazy eg just before establishing a stream using ProxyCommand
